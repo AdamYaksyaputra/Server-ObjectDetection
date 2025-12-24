@@ -1,0 +1,11 @@
+node_modules
+yarn.lock
+package-lock.json
+build
+.env
+/public/uploads
+.vercel
+
+# .gitignore
+# alarmfirebasekey.json
+# objectdetectionflutter.json

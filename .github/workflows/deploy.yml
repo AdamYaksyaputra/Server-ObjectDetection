@@ -1,0 +1,31 @@
+# name: Deploy to Server
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#     - name: Checkout repo
+#       uses: actions/checkout@v3
+
+#     - name: Setup SSH
+#       run: |
+#         mkdir -p ~/.ssh
+#         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+#         chmod 600 ~/.ssh/id_ed25519
+#         ssh-keyscan -H 103.127.99.82 >> ~/.ssh/known_hosts
+
+#     - name: Deploy to Server via SSH
+#       run: |
+#         ssh -i ~/.ssh/id_ed25519 root@103.127.99.82 << 'EOF'
+#           cd /var/www/Server-ObjectDetection
+#           git pull origin main
+#           npm install
+#           npx sequelize-cli db:migrate 
+#           pm2 restart “be-objectdetection”
+#         EOF
