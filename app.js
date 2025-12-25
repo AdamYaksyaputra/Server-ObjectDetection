@@ -6,6 +6,7 @@ const os = require('os');
 
 const sequelize = require('./config/database');
 const routes = require('./routes');
+const { startCleanupScheduler } = require('./utils/dataCleanup');
 
 require('./models');
 
@@ -49,6 +50,9 @@ class App {
 
       this.app.listen(this.port, '0.0.0.0', () => {
         console.log(` > Server is running on http://${getLocalIP()}:${this.port}`);
+
+        // Start data cleanup scheduler (delete data older than 30 days)
+        startCleanupScheduler();
       });
     } catch (error) {
       console.error(' > Error connecting to the database:', error.message);
