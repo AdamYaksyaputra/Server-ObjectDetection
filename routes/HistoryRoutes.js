@@ -32,13 +32,19 @@ router.get("/api/history/:id", protect, getHistory);
 router.post(
   "/api/history",
   protect,
-  upload.single("photo_url"),
+  upload.array("photos", 5), // Support up to 5 photos
   (req, res) => {
-    let finalImageURL = req.file
-      ? req.protocol + "://" + req.get("host") + "/uploads/" + req.file.filename
-      : null;
-
-    createHistory(req, res, finalImageURL);
+    let photoUrls = [];
+    if (req.files && req.files.length > 0) {
+      photoUrls = req.files.map(file =>
+        req.protocol + "://" + req.get("host") + "/uploads/" + file.filename
+      );
+    }
+    // For backward compatibility, also check single file
+    if (req.file) {
+      photoUrls.push(req.protocol + "://" + req.get("host") + "/uploads/" + req.file.filename);
+    }
+    createHistory(req, res, photoUrls.length > 0 ? photoUrls : null);
   }
 );
 
@@ -46,10 +52,15 @@ router.post(
 router.put(
   "/api/history/:id",
   protect,
-  upload.single("photo_url"),
+  upload.array("photos", 5), // Support up to 5 photos
   (req, res) => {
-    if (req.file) {
-      req.body.photo_url = req.protocol + "://" + req.get("host") + "/uploads/" + req.file.filename;
+    if (req.files && req.files.length > 0) {
+      req.body.photo_url = req.files.map(file =>
+        req.protocol + "://" + req.get("host") + "/uploads/" + file.filename
+      );
+    } else if (req.file) {
+      // Backward compatibility for single file
+      req.body.photo_url = [req.protocol + "://" + req.get("host") + "/uploads/" + req.file.filename];
     }
     updateHistory(req, res);
   }

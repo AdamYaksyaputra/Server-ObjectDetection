@@ -31,8 +31,27 @@ const History = sequelize.define('history', {
     allowNull: false
   },
   photo_url: {
-    type: DataTypes.STRING,
-    allowNull: true
+    type: DataTypes.TEXT, // Changed to TEXT to support JSON array of multiple photo URLs
+    allowNull: true,
+    get() {
+      const rawValue = this.getDataValue('photo_url');
+      if (!rawValue) return [];
+      try {
+        return JSON.parse(rawValue);
+      } catch (e) {
+        // Legacy single URL support
+        return rawValue ? [rawValue] : [];
+      }
+    },
+    set(value) {
+      if (Array.isArray(value)) {
+        this.setDataValue('photo_url', JSON.stringify(value));
+      } else if (value) {
+        this.setDataValue('photo_url', JSON.stringify([value]));
+      } else {
+        this.setDataValue('photo_url', null);
+      }
+    }
   },
   status: {
     type: DataTypes.INTEGER,
