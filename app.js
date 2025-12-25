@@ -7,6 +7,8 @@ const os = require('os');
 const sequelize = require('./config/database');
 const routes = require('./routes');
 const { startCleanupScheduler } = require('./utils/dataCleanup');
+const { errorLoggingMiddleware, logInfo } = require('./utils/logger');
+const { rateLimitMiddleware } = require('./utils/rateLimiter');
 
 require('./models');
 
@@ -24,13 +26,19 @@ class App {
   configureMiddleware() {
     this.app.use(cors({ origin: '*', credentials: true }));
     this.app.use('/public', express.static(path.join(__dirname, 'public')));
-    this.app.use('/uploads', express.static(path.join(__dirname, 'public/uploads'))); // Serve uploaded photos
+    this.app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
+
+    // Rate limiting - 100 requests per minute per IP
+    this.app.use('/api', rateLimitMiddleware);
   }
 
   configureRoutes() {
     this.app.use(routes);
+
+    // Error logging middleware (must be after routes)
+    this.app.use(errorLoggingMiddleware);
   }
 
   async connectToDatabase() {
