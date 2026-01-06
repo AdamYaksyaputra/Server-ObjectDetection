@@ -24,11 +24,11 @@ module.exports = {
         },
       },
       latitude: {
-        type: Sequelize.DOUBLE,
+        type: Sequelize.DECIMAL(10, 8),
         allowNull: false
       },
       longitude: {
-        type: Sequelize.DOUBLE,
+        type: Sequelize.DECIMAL(11, 8),
         allowNull: false
       },
       isOn: {

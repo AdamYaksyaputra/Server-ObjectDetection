@@ -20,11 +20,11 @@ const Sensor = sequelize.define('sensor', {
     allowNull: false
   },
   latitude: {
-    type: DataTypes.DOUBLE,
+    type: DataTypes.DECIMAL(10, 8),
     allowNull: false,
   },
   longitude: {
-    type: DataTypes.DOUBLE,
+    type: DataTypes.DECIMAL(11, 8),
     allowNull: false,
   },
   isOn: {
